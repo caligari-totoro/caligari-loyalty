@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>東京冠軍咖哩飯專門店 Caligari - 會員忠誠度計劃</title>
+    <style>
+        :root {
+            --primary: #e65c00;
+            --secondary: #f9a03f;
+            --dark: #333;
+            --light: #f5f5f5;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="%23e65c00"/><circle cx="200" cy="100" r="80" fill="%23f9a03f"/></svg>');
+            background-size: cover;
+            color: white;
+            text-align: center;
+            padding: 5rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .tiers-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .tier-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            transition: transform 0.3s;
+        }
+        
+        .tier-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .tier-header {
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .tier-card:nth-child(1) .tier-header {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .tier-card:nth-child(2) .tier-header {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tier-content {
+            padding: 1.5rem;
+        }
+        
+        .tier-content ul {
+            list-style-type: none;
+            margin: 1rem 0;
+        }
+        
+        .tier-content li {
+            margin-bottom: 0.8rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .tier-content li:before {
+            content: "•";
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .join-btn {
+            display: block;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            margin-top: 1.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .join-btn:hover {
+            background-color: #d14f00;
+        }
+        
+        .login-section {
+            background-color: white;
+            padding: 3rem 0;
+            margin: 3rem 0;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #d14f00;
+        }
+        
+        .locations-section {
+            margin: 3rem 0;
+        }
+        
+        .locations-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+        
+        .location-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        .location-content {
+            padding: 1.5rem;
+        }
+        
+        .location-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .faq-section {
+            margin: 3rem 0;
+        }
+        
+        .faq-item {
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: #f8f8f8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-answer {
+            padding: 0 1rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 1rem;
+            max-height: 200px;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .tiers-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .locations-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>東京冠軍咖哩飯專門店 Caligari</h1>
+            <p>正宗日本咖喱專門店</p>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="container">
+            <h2>會員忠誠度計劃</h2>
+            <p>加入我們的會員計劃，獲取積分和專屬優惠，讓每一次用餐更加滿足！</p>
+        </div>
+    </section>
+    
+    <section class="container">
+        <h2 style="text-align: center; margin-bottom: 2rem;">會員等級及優惠</h2>
+        
+        <div class="tiers-container">
+            <div class="tier-card">
+                <div class="tier-header">
+                    <h3>咖喱愛好者</h3>
+                    <p>Curry Lover</p>
+                </div>
+                <div class="tier-content">
+                    <p><strong>積分要求：</strong> 0-500分</p>
+                    <p><strong>積分換算：</strong> 每消費$100 = 10分</p>
+                    <h4>專屬優惠：</h4>
+                    <ul>
+                        <li>生日贈送免費飲品</li>
+                        <li>每累積100分獲得$10折扣券</li>
+                        <li>參與會員專屬活動</li>
+                    </ul>
+                    <a href="#join" class="join-btn">立即加入</a>
+                </div>
+            </div>
+            
+            <div class="tier-card">
+                <div class="tier-header">
+                    <h3>咖喱大師</h3>
+                    <p>Curry Master</p>
+                </div>
+                <div class="tier-content">
+                    <p><strong>積分要求：</strong> 500分以上</p>
+                    <p><strong>積分換算：</strong> 每消費$80 = 15分</p>
+                    <h4>專屬優惠：</h4>
+                    <ul>
+                        <li>包括咖喱愛好者所有優惠</li>
+                        <li>每月一次免費配菜升級</li>
+                        <li>每累積200分獲得免費咖喱飯一份</li>
+                    </ul>
+                    <a href="#join" class="join-btn">提升等級</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="container locations-section">
+        <h2 style="text-align: center; margin-bottom: 2rem;">我們的店舖</h2>
+        
+        <div class="locations-grid">
+            <div class="location-card">
+                <div class="location-content">
+                    <div class="location-title">中環店</div>
+                    <p>中環皇后大道中30號娛樂行2樓F號舖</p>
+                    <p><strong>營業時間：</strong> 11:30 - 21:30</p>
+                    <p><strong>電話：</strong> 2XXX XXXX</p>
+                </div>
+            </div>
+            
+            <div class="location-card">
+                <div class="location-content">
+                    <div class="location-title">沙田店</div>
+                    <p>一田沙田店Food court內</p>
+                    <p><strong>營業時間：</strong> 11:00 - 22:00</p>
+                    <p><strong>電話：</strong> 2XXX XXXX</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="join" class="login-section">
+        <div class="container">
+            <h2>會員登入/註冊</h2>
+            <p>使用您的手機號碼登入或註冊成為會員</p>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="phone">手機號碼</label>
+                    <input type="tel" id="phone" placeholder="請輸入您的手機號碼" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="name">姓名 (僅限新會員)</label>
+                    <input type="text" id="name" placeholder="請輸入您的姓名">
+                </div>
+                
+                <div class="form-group">
+                    <label for="birthday">生日 (僅限新會員)</label>
+                    <input type="date" id="birthday">
+                </div>
+                
+                <button type="submit" class="submit-btn">登入/註冊</button>
+            </div>
+        </div>
+    </section>
+    
+    <section class="container faq-section">
+        <h2 style="text-align: center; margin-bottom: 2rem;">常見問題</h2>
+        
+        <div class="faq-item">
+            <div class="faq-question">
+                如何成為會員？ <span>+</span>
+            </div>
+            <div class="faq-answer">
+                只需在我們的網站或店內提供您的手機號碼進行註冊，即可成為「咖喱愛好者」會員，開始累積積分。
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">
+                積分有效期是多久？ <span>+</span>
+            </div>
+            <div class="faq-answer">
+                會員積分有效期為一年，自獲取日起計算。請定期使用您的積分以避免過期。
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">
+                如何查詢我的積分？ <span>+</span>
+            </div>
+            <div class="faq-answer">
+                您可以在網站登入會員賬戶查詢，或在店內消費時向店員詢問。
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">
+                如何升級為「咖喱大師」？ <span>+</span>
+            </div>
+            <div class="faq-answer">
+                只要您累積的積分達到500分或以上，系統會自動將您升級為「咖喱大師」級別，並享受相應的優惠。
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <p>© 2025 東京冠軍咖哩飯專門店 Caligari. 版權所有.</p>
+            <p>中環店：中環皇后大道中30號娛樂行2樓F號舖</p>
+            <p>沙田店：一田沙田店Food court內</p>
+            <p>電話：2XXX XXXX</p>
+        </div>
+    </footer>
+    
+    <script>
+        // FAQ展開/收起功能
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const parent = question.parentElement;
+                parent.classList.toggle('active');
+                const span = question.querySelector('span');
+                span.textContent = parent.classList.contains('active') ? '-' : '+';
+            });
+        });
+        
+        // 模擬會員登入/註冊
+        document.querySelector('.submit-btn').addEventListener('click', () => {
+            const phone = document.getElementById('phone').value;
+            const name = document.getElementById('name').value;
+            
+            if(phone) {
+                alert('操作成功！我們會發送一條確認短信到您的手機。');
+                document.getElementById('phone').value = '';
+                document.getElementById('name').value = '';
+                document.getElementById('birthday').value = '';
+            } else {
+                alert('請輸入手機號碼');
+            }
+        });
+    </script>
+</body>
+</html>
