@@ -6,9 +6,9 @@
     <title>東京冠軍咖哩飯專門店 Caligari - 會員忠誠度計劃</title>
     
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <style>
         :root {
@@ -494,6 +494,29 @@
             border: 1px solid #c8e6c9;
         }
         
+        /* 重要提示樣式 */
+        .important-notice {
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        
+        .important-notice h2 {
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .important-notice ol {
+            margin-left: 20px;
+        }
+        
+        .important-notice li {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
         @media (max-width: 768px) {
             .tiers-container {
                 flex-direction: column;
@@ -517,6 +540,10 @@
                 display: block;
                 overflow-x: auto;
             }
+            
+            .important-notice h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -527,6 +554,20 @@
             <p>正宗日本咖喱專門店</p>
         </div>
     </header>
+    
+    <!-- 重要提示區塊 -->
+    <div class="container" style="margin-top: 30px;">
+        <div class="important-notice">
+            <h2>重要注意事項</h2>
+            <ol>
+                <li>此代碼中的 Firebase 配置信息需要替換為您自己的</li>
+                <li>Firebase 提供慷慨的免費額度，適合小型或中型忠誠度計劃</li>
+                <li>超過免費額度後，Firebase 會根據使用量收費</li>
+                <li>對於生產環境，應該考慮實施更嚴格的安全規則和錯誤處理</li>
+                <li>管理員密碼在實際應用中應該更加安全地存儲</li>
+            </ol>
+        </div>
+    </div>
     
     <section class="hero">
         <div class="container">
@@ -877,15 +918,15 @@
     </footer>
     
     <script>
-        // Firebase 配置
+        // Firebase 配置 - 需要替換為您自己的配置
         const firebaseConfig = {
-          apiKey: "AIzaSyBTUy_gb8Ej57OFgRl7OCftgk_Bcuszg00",
-          authDomain: "caligari-e2790.firebaseapp.com",
-          projectId: "caligari-e2790",
-          storageBucket: "caligari-e2790.firebasestorage.app",
-          messagingSenderId: "350560116623",
-          appId: "1:350560116623:web:718334afb82072262b35fa",
-          measurementId: "G-69H5NPMPR5"
+          // 請在這裡放置您從Firebase控制台獲取的配置
+          apiKey: "您的API密鑰",
+          authDomain: "您的項目.firebaseapp.com",
+          projectId: "您的項目ID",
+          storageBucket: "您的項目.appspot.com",
+          messagingSenderId: "您的發送者ID",
+          appId: "您的應用ID"
         };
         
         // 初始化 Firebase
