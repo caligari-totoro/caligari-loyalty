@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>東京冠軍咖哩飯專門店 Caligari - 會員忠誠度計劃</title>
     
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK - 使用最新版本 -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -516,6 +516,17 @@
             margin-bottom: 15px;
             line-height: 1.5;
         }
+
+        /* 本地存儲會員信息提示 */
+        .local-storage-notice {
+            background-color: #f8f5e4;
+            border: 1px solid #e6deb1;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #6b5900;
+        }
         
         @media (max-width: 768px) {
             .tiers-container {
@@ -560,11 +571,11 @@
         <div class="important-notice">
             <h2>重要注意事項</h2>
             <ol>
-                <li>此代碼中的 Firebase 配置信息需要替換為您自己的</li>
-                <li>Firebase 提供慷慨的免費額度，適合小型或中型忠誠度計劃</li>
-                <li>超過免費額度後，Firebase 會根據使用量收費</li>
+                <li>此示範版本使用了本地存儲來模擬會員功能，無需連接 Firebase</li>
+                <li>所有會員數據僅保存在您的瀏覽器中，不會上傳到任何服務器</li>
+                <li>這是一個前端演示版本，實際應用中應使用安全的後端服務</li>
                 <li>對於生產環境，應該考慮實施更嚴格的安全規則和錯誤處理</li>
-                <li>管理員密碼在實際應用中應該更加安全地存儲</li>
+                <li>清除瀏覽器數據會導致所有會員信息丟失</li>
             </ol>
         </div>
     </div>
@@ -646,6 +657,10 @@
         <div class="container">
             <h2>會員登入/註冊</h2>
             <p>使用您的手機號碼和密碼登入或註冊成為會員</p>
+            
+            <div class="local-storage-notice">
+                <p><strong>注意：</strong> 此示範版本使用瀏覽器本地存儲功能，所有會員資料僅保存在您的裝置上。</p>
+            </div>
             
             <div id="loading-spinner">
                 <div class="spinner"></div>
@@ -918,21 +933,8 @@
     </footer>
     
     <script>
-        // Firebase 配置 - 從Firebase控制台獲取的配置
-        const firebaseConfig = {
-            apiKey: "AIzaSyBTUy_gb8Ej57OFgRl7OCftgk_Bcuszg00",
-            authDomain: "caligari-e2790.firebaseapp.com",
-            projectId: "caligari-e2790",
-            storageBucket: "caligari-e2790.firebasestorage.app",
-            messagingSenderId: "350560116623",
-            appId: "1:350560116623:web:718334afb82072262b35fa",
-            measurementId: "G-69H5NPMPR5"
-        };
-        
-        // 初始化 Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+        // 使用本地存儲模擬會員數據庫
+        const MEMBERS_KEY = 'caligari_members';
         
         // 管理員密碼
         const ADMIN_PASSWORD = "caligari2025"; 
@@ -961,6 +963,30 @@
             }, 5000);
         }
         
+        // 獲取所有會員
+        function getAllMembers() {
+            const members = localStorage.getItem(MEMBERS_KEY);
+            return members ? JSON.parse(members) : {};
+        }
+        
+        // 保存所有會員
+        function saveAllMembers(members) {
+            localStorage.setItem(MEMBERS_KEY, JSON.stringify(members));
+        }
+        
+        // 獲取會員
+        function getMember(phone) {
+            const members = getAllMembers();
+            return members[phone] || null;
+        }
+        
+        // 保存會員
+        function saveMember(phone, data) {
+            const members = getAllMembers();
+            members[phone] = data;
+            saveAllMembers(members);
+        }
+        
         // 頁面加載完成後執行
         document.addEventListener("DOMContentLoaded", function() {
             // 註冊/登入表單切換
@@ -986,21 +1012,20 @@
                 
                 showLoading();
                 
-                // 使用 Firebase 身份驗證登入
-                auth.signInWithEmailAndPassword(`${phone}@caligari.com`, password)
-                    .then((userCredential) => {
-                        // 登入成功，獲取用戶信息
-                        getMemberInfo(phone);
-                    })
-                    .catch((error) => {
+                // 模擬網絡延遲
+                setTimeout(() => {
+                    const member = getMember(phone);
+                    
+                    if (!member || member.password !== password) {
                         hideLoading();
-                        
-                        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                            showMessage('手機號碼或密碼錯誤');
-                        } else {
-                            showMessage('登入失敗：' + error.message);
-                        }
-                    });
+                        showMessage('手機號碼或密碼錯誤');
+                        return;
+                    }
+                    
+                    currentUser = member;
+                    showMemberInfo();
+                    hideLoading();
+                }, 800);
             });
             
             // 會員註冊
@@ -1023,52 +1048,51 @@
                 
                 showLoading();
                 
-                // 檢查用戶是否已存在
-                db.collection("members").doc(phone).get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            hideLoading();
-                            showMessage('該手機號碼已註冊');
-                            return;
-                        }
-                        
-                        // 創建認證用戶
-                        return auth.createUserWithEmailAndPassword(`${phone}@caligari.com`, password)
-                            .then((userCredential) => {
-                                // 創建新會員數據
-                                const memberData = {
-                                    phone: phone,
-                                    name: name,
-                                    birthday: birthday,
-                                    tier: 'Curry Lover',
-                                    totalPoints: 0,
-                                    availablePoints: 0,
-                                    joinDate: new Date().toISOString()
-                                };
-                                
-                                // 保存到 Firestore
-                                return db.collection("members").doc(phone).set(memberData);
-                            })
-                            .then(() => {
-                                // 註冊成功，獲取會員信息
-                                getMemberInfo(phone);
-                            });
-                    })
-                    .catch((error) => {
+                // 模擬網絡延遲
+                setTimeout(() => {
+                    // 檢查用戶是否已存在
+                    if (getMember(phone)) {
                         hideLoading();
-                        showMessage('註冊失敗：' + error.message);
-                    });
+                        showMessage('該手機號碼已註冊');
+                        return;
+                    }
+                    
+                    // 創建新會員數據
+                    const memberData = {
+                        phone: phone,
+                        password: password,
+                        name: name,
+                        birthday: birthday,
+                        tier: 'Curry Lover',
+                        totalPoints: 0,
+                        availablePoints: 0,
+                        joinDate: new Date().toISOString()
+                    };
+                    
+                    // 保存會員
+                    saveMember(phone, memberData);
+                    
+                    // 設置當前用戶
+                    currentUser = memberData;
+                    
+                    // 顯示會員信息
+                    showMemberInfo();
+                    hideLoading();
+                    
+                    // 顯示成功信息
+                    showMessage('註冊成功！歡迎成為咖喱愛好者！', 'success');
+                }, 800);
             });
             
             // 會員登出
             document.getElementById('logout-btn').addEventListener('click', function() {
-                auth.signOut().then(() => {
-                    currentUser = null;
-                    document.getElementById('member-info').style.display = 'none';
-                    document.getElementById('member-login-form').style.display = 'block';
-                }).catch((error) => {
-                    showMessage('登出失敗：' + error.message);
-                });
+                currentUser = null;
+                document.getElementById('member-info').style.display = 'none';
+                document.getElementById('member-login-form').style.display = 'block';
+                
+                // 清空登入表單
+                document.getElementById('login-phone').value = '';
+                document.getElementById('login-password').value = '';
             });
             
             // 私隱政策相關
@@ -1140,82 +1164,66 @@
                 
                 showLoading();
                 
-                db.collection("members").doc(phone).get()
-                    .then((doc) => {
-                        if (!doc.exists) {
-                            hideLoading();
-                            resultDiv.innerHTML = '<span style="color: red;">未找到該會員</span>';
-                            return;
-                        }
-                        
-                        const member = doc.data();
-                        let pointsToAdd;
-                        
-                        // 根據會員等級計算積分
-                        if (member.tier === 'Curry Lover') {
-                            // 每消費$100 = 10分
-                            pointsToAdd = Math.floor(amount / 100) * 10;
-                        } else {
-                            // 每消費$80 = 15分
-                            pointsToAdd = Math.floor(amount / 80) * 15;
-                        }
-                        
-                        // 更新會員積分
-                        const totalPoints = (member.totalPoints || 0) + pointsToAdd;
-                        const availablePoints = (member.availablePoints || 0) + pointsToAdd;
-                        
-                        // 檢查是否需要升級
-                        let tier = member.tier;
-                        let tierChanged = false;
-                        if (tier === 'Curry Lover' && totalPoints >= 500) {
-                            tier = 'Curry Master';
-                            tierChanged = true;
-                        }
-                        
-                        // 更新數據庫
-                        return db.collection("members").doc(phone).update({
-                            totalPoints: totalPoints,
-                            availablePoints: availablePoints,
-                            tier: tier
-                        }).then(() => {
-                            hideLoading();
-                            resultDiv.innerHTML = `
-                                <span style="color: green;">成功添加 ${pointsToAdd} 積分給 ${member.name}</span>
-                                ${tierChanged ? '<p style="color: blue; margin-top: 5px;">會員已升級為咖喱大師！</p>' : ''}
-                            `;
-                            
-                            // 清空表單
-                            document.getElementById('point-phone').value = '';
-                            document.getElementById('point-amount').value = '';
-                            
-                            // 重新載入會員列表
-                            loadMembers();
-                            
-                            // 如果當前用戶是被修改的會員，更新顯示
-                            if (currentUser && currentUser.phone === phone) {
-                                getMemberInfo(phone);
-                            }
-                        });
-                    })
-                    .catch((error) => {
+                // 模擬網絡延遲
+                setTimeout(() => {
+                    const member = getMember(phone);
+                    
+                    if (!member) {
                         hideLoading();
-                        resultDiv.innerHTML = '<span style="color: red;">添加積分時出錯：' + error.message + '</span>';
-                    });
-            });
-            
-            // 檢查用戶身份驗證狀態
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    // 用戶已登入
-                    const email = user.email;
-                    const phone = email.split('@')[0];
-                    getMemberInfo(phone);
-                } else {
-                    // 用戶未登入
-                    currentUser = null;
-                    document.getElementById('member-info').style.display = 'none';
-                    document.getElementById('member-login-form').style.display = 'block';
-                }
+                        resultDiv.innerHTML = '<span style="color: red;">未找到該會員</span>';
+                        return;
+                    }
+                    
+                    let pointsToAdd;
+                    
+                    // 根據會員等級計算積分
+                    if (member.tier === 'Curry Lover') {
+                        // 每消費$100 = 10分
+                        pointsToAdd = Math.floor(amount / 100) * 10;
+                    } else {
+                        // 每消費$80 = 15分
+                        pointsToAdd = Math.floor(amount / 80) * 15;
+                    }
+                    
+                    // 更新會員積分
+                    const totalPoints = (member.totalPoints || 0) + pointsToAdd;
+                    const availablePoints = (member.availablePoints || 0) + pointsToAdd;
+                    
+                    // 檢查是否需要升級
+                    let tier = member.tier;
+                    let tierChanged = false;
+                    if (tier === 'Curry Lover' && totalPoints >= 500) {
+                        tier = 'Curry Master';
+                        tierChanged = true;
+                    }
+                    
+                    // 更新會員數據
+                    member.totalPoints = totalPoints;
+                    member.availablePoints = availablePoints;
+                    member.tier = tier;
+                    
+                    // 保存更新的會員數據
+                    saveMember(phone, member);
+                    
+                    hideLoading();
+                    resultDiv.innerHTML = `
+                        <span style="color: green;">成功添加 ${pointsToAdd} 積分給 ${member.name}</span>
+                        ${tierChanged ? '<p style="color: blue; margin-top: 5px;">會員已升級為咖喱大師！</p>' : ''}
+                    `;
+                    
+                    // 清空表單
+                    document.getElementById('point-phone').value = '';
+                    document.getElementById('point-amount').value = '';
+                    
+                    // 重新載入會員列表
+                    loadMembers();
+                    
+                    // 如果當前用戶是被修改的會員，更新顯示
+                    if (currentUser && currentUser.phone === phone) {
+                        currentUser = member;
+                        updateMemberInfoDisplay();
+                    }
+                }, 800);
             });
             
             // FAQ展開/收起功能
@@ -1227,34 +1235,26 @@
                     span.textContent = parent.classList.contains('active') ? '-' : '+';
                 });
             });
+            
+            // 檢查是否有保存的登入狀態
+            const savedPhone = localStorage.getItem('currentUserPhone');
+            if (savedPhone) {
+                const member = getMember(savedPhone);
+                if (member) {
+                    currentUser = member;
+                    showMemberInfo();
+                }
+            }
         });
-        
-        // 獲取會員信息
-        function getMemberInfo(phone) {
-            db.collection("members").doc(phone).get()
-                .then((doc) => {
-                    hideLoading();
-                    
-                    if (doc.exists) {
-                        currentUser = doc.data();
-                        showMemberInfo();
-                    } else {
-                        // 用戶存在於認證系統但不在數據庫中
-                        showMessage('無法獲取會員信息，請聯絡客服');
-                        auth.signOut();
-                    }
-                })
-                .catch((error) => {
-                    hideLoading();
-                    showMessage('獲取會員信息失敗：' + error.message);
-                });
-        }
         
         // 顯示會員信息
         function showMemberInfo() {
             document.getElementById('member-login-form').style.display = 'none';
             document.getElementById('member-register-form').style.display = 'none';
             document.getElementById('member-info').style.display = 'block';
+            
+            // 保存當前用戶電話，用於自動登入
+            localStorage.setItem('currentUserPhone', currentUser.phone);
             
             updateMemberInfoDisplay();
         }
@@ -1276,44 +1276,40 @@
         function loadMembers() {
             showLoading();
             
-            db.collection("members").get()
-                .then((querySnapshot) => {
-                    hideLoading();
+            // 模擬網絡延遲
+            setTimeout(() => {
+                const members = getAllMembers();
+                const membersTable = document.getElementById('members-list');
+                membersTable.innerHTML = '';
+                
+                Object.values(members).forEach(member => {
+                    const row = document.createElement('tr');
                     
-                    const membersTable = document.getElementById('members-list');
-                    membersTable.innerHTML = '';
+                    // 格式化日期
+                    let joinDate = '未知';
+                    if (member.joinDate) {
+                        const date = new Date(member.joinDate);
+                        joinDate = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                    }
                     
-                    querySnapshot.forEach((doc) => {
-                        const member = doc.data();
-                        const row = document.createElement('tr');
-                        
-                        // 格式化日期
-                        let joinDate = '未知';
-                        if (member.joinDate) {
-                            const date = new Date(member.joinDate);
-                            joinDate = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-                        }
-                        
-                        // 轉換會員等級顯示
-                        const tierDisplay = member.tier === 'Curry Lover' ? '咖喱愛好者' : '咖喱大師';
-                        
-                        row.innerHTML = `
-                            <td>${member.name || '未設置'}</td>
-                            <td>${member.phone || '未設置'}</td>
-                            <td>${member.birthday || '未設置'}</td>
-                            <td>${tierDisplay}</td>
-                            <td>${member.totalPoints || 0}</td>
-                            <td>${member.availablePoints || 0}</td>
-                            <td>${joinDate}</td>
-                        `;
-                        
-                        membersTable.appendChild(row);
-                    });
-                })
-                .catch((error) => {
-                    hideLoading();
-                    showMessage('獲取會員列表失敗：' + error.message);
+                    // 轉換會員等級顯示
+                    const tierDisplay = member.tier === 'Curry Lover' ? '咖喱愛好者' : '咖喱大師';
+                    
+                    row.innerHTML = `
+                        <td>${member.name || '未設置'}</td>
+                        <td>${member.phone || '未設置'}</td>
+                        <td>${member.birthday || '未設置'}</td>
+                        <td>${tierDisplay}</td>
+                        <td>${member.totalPoints || 0}</td>
+                        <td>${member.availablePoints || 0}</td>
+                        <td>${joinDate}</td>
+                    `;
+                    
+                    membersTable.appendChild(row);
                 });
+                
+                hideLoading();
+            }, 800);
         }
         
         // 標籤切換功能
