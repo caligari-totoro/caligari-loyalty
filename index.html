@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>東京冠軍咖哩飯專門店 Caligari - 會員忠誠度計劃</title>
     
-    <!-- Firebase SDK - 使用最新版本 -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -189,6 +189,53 @@
         
         .submit-btn:hover {
             background-color: #d14f00;
+        }
+        
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .google-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .google-icon {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .or-divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #777;
+        }
+        
+        .or-divider::before, .or-divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .or-divider::before {
+            margin-right: 10px;
+        }
+        
+        .or-divider::after {
+            margin-left: 10px;
         }
         
         .locations-section {
@@ -494,38 +541,34 @@
             border: 1px solid #c8e6c9;
         }
         
-        /* 重要提示樣式 */
-        .important-notice {
-            background-color: #222;
-            color: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-        
-        .important-notice h2 {
-            margin-bottom: 15px;
-            font-size: 1.8rem;
-        }
-        
-        .important-notice ol {
-            margin-left: 20px;
-        }
-        
-        .important-notice li {
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        /* 本地存儲會員信息提示 */
-        .local-storage-notice {
-            background-color: #f8f5e4;
-            border: 1px solid #e6deb1;
-            padding: 10px 15px;
-            margin: 15px 0;
+        .debug-section {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 20px 0;
             border-radius: 4px;
-            font-size: 0.9rem;
-            color: #6b5900;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        
+        .phone-input-group {
+            margin-top: 15px;
+            display: none;
         }
         
         @media (max-width: 768px) {
@@ -551,10 +594,6 @@
                 display: block;
                 overflow-x: auto;
             }
-            
-            .important-notice h2 {
-                font-size: 1.5rem;
-            }
         }
     </style>
 </head>
@@ -565,20 +604,6 @@
             <p>正宗日本咖喱專門店</p>
         </div>
     </header>
-    
-    <!-- 重要提示區塊 -->
-    <div class="container" style="margin-top: 30px;">
-        <div class="important-notice">
-            <h2>重要注意事項</h2>
-            <ol>
-                <li>此示範版本使用了本地存儲來模擬會員功能，無需連接 Firebase</li>
-                <li>所有會員數據僅保存在您的瀏覽器中，不會上傳到任何服務器</li>
-                <li>這是一個前端演示版本，實際應用中應使用安全的後端服務</li>
-                <li>對於生產環境，應該考慮實施更嚴格的安全規則和錯誤處理</li>
-                <li>清除瀏覽器數據會導致所有會員信息丟失</li>
-            </ol>
-        </div>
-    </div>
     
     <section class="hero">
         <div class="container">
@@ -656,11 +681,7 @@
     <section id="join" class="login-section">
         <div class="container">
             <h2>會員登入/註冊</h2>
-            <p>使用您的手機號碼和密碼登入或註冊成為會員</p>
-            
-            <div class="local-storage-notice">
-                <p><strong>注意：</strong> 此示範版本使用瀏覽器本地存儲功能，所有會員資料僅保存在您的裝置上。</p>
-            </div>
+            <p>加入會員計劃並開始累積您的積分</p>
             
             <div id="loading-spinner">
                 <div class="spinner"></div>
@@ -671,6 +692,18 @@
             
             <!-- 會員登入表單 -->
             <div id="member-login-form">
+                <button id="google-signin-btn" class="google-btn">
+                    <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    使用 Google 登入
+                </button>
+                
+                <div class="or-divider">或</div>
+                
                 <div class="form-group">
                     <label for="login-phone">手機號碼</label>
                     <input type="tel" id="login-phone" placeholder="請輸入您的手機號碼" required>
@@ -690,6 +723,18 @@
             
             <!-- 會員註冊表單 -->
             <div id="member-register-form" style="display: none;">
+                <button id="google-register-btn" class="google-btn">
+                    <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    </svg>
+                    使用 Google 註冊
+                </button>
+                
+                <div class="or-divider">或</div>
+                
                 <div class="form-group">
                     <label for="reg-phone">手機號碼</label>
                     <input type="tel" id="reg-phone" placeholder="請輸入您的手機號碼" required>
@@ -724,10 +769,52 @@
                 </div>
             </div>
             
+            <!-- Google 登入後填寫額外信息 -->
+            <div id="google-info-form" style="display: none;">
+                <div class="user-profile">
+                    <img id="user-avatar" class="user-avatar" src="" alt="用戶頭像">
+                    <div>
+                        <h3>歡迎，<span id="google-user-name"></span></h3>
+                        <p id="google-user-email" style="color: #666; font-size: 0.9rem;"></p>
+                    </div>
+                </div>
+                
+                <p>請完成以下信息以完成註冊</p>
+                
+                <div class="form-group">
+                    <label for="google-phone">手機號碼</label>
+                    <input type="tel" id="google-phone" placeholder="請輸入您的手機號碼" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="google-birthday">生日</label>
+                    <input type="date" id="google-birthday" required>
+                </div>
+                
+                <div class="privacy-checkbox">
+                    <input type="checkbox" id="google-privacy-consent" required>
+                    <label for="google-privacy-consent">
+                        我已閱讀並同意 <span class="privacy-link" id="google-open-privacy">個人資料收集聲明</span>
+                    </label>
+                </div>
+                
+                <button id="google-complete-btn" class="submit-btn">完成註冊</button>
+            </div>
+            
             <!-- 登入後顯示會員信息 -->
             <div id="member-info">
-                <h3>會員詳情</h3>
-                <p>歡迎回來，<span id="member-name">會員</span>！</p>
+                <div class="user-profile" id="google-profile-section" style="display: none;">
+                    <img id="member-avatar" class="user-avatar" src="" alt="用戶頭像">
+                    <div>
+                        <h3>歡迎回來，<span id="member-name">會員</span>！</h3>
+                        <p id="member-email" style="color: #666; font-size: 0.9rem;"></p>
+                    </div>
+                </div>
+                
+                <div id="normal-profile-section">
+                    <h3>會員詳情</h3>
+                    <p>歡迎回來，<span id="normal-member-name">會員</span>！</p>
+                </div>
                 
                 <div class="tier-info">
                     <h4>您目前的會員等級：<span id="member-tier">咖喱愛好者</span></h4>
@@ -788,6 +875,7 @@
                             <tr>
                                 <th>姓名</th>
                                 <th>電話</th>
+                                <th>電子郵件</th>
                                 <th>生日</th>
                                 <th>會員等級</th>
                                 <th>總積分</th>
@@ -806,8 +894,8 @@
                 <h4>為會員添加積分</h4>
                 <div class="login-form">
                     <div class="form-group">
-                        <label for="point-phone">會員電話</label>
-                        <input type="tel" id="point-phone" placeholder="請輸入會員電話號碼">
+                        <label for="point-phone">會員電話或電子郵件</label>
+                        <input type="text" id="point-phone" placeholder="請輸入會員電話號碼或電子郵件">
                     </div>
                     
                     <div class="form-group">
@@ -835,7 +923,7 @@
                 如何成為會員？ <span>+</span>
             </div>
             <div class="faq-answer">
-                只需在我們的網站或店內提供您的手機號碼進行註冊，即可成為「咖喱愛好者」會員，開始累積積分。
+                您可以使用 Google 賬戶快速註冊，或者提供您的手機號碼和基本資料進行註冊，即可成為「咖喱愛好者」會員，開始累積積分。
             </div>
         </div>
         
@@ -878,6 +966,7 @@
             <p>我們會收集以下個人資料：</p>
             <ul style="margin-left: 20px; margin-top: 5px;">
                 <li>姓名</li>
+                <li>電子郵件地址</li>
                 <li>手機號碼</li>
                 <li>生日日期</li>
             </ul>
@@ -921,6 +1010,12 @@
         </div>
     </div>
     
+    <!-- 調試區域 -->
+    <div id="debug-info" class="debug-section">
+        <h3>Firebase 連接調試信息</h3>
+        <div id="debug-output"></div>
+    </div>
+    
     <footer>
         <div class="container">
             <p>© 2025 東京冠軍咖哩飯專門店 Caligari. 版權所有.</p>
@@ -933,14 +1028,51 @@
     </footer>
     
     <script>
-        // 使用本地存儲模擬會員數據庫
-        const MEMBERS_KEY = 'caligari_members';
+        // Firebase 配置 - 使用您提供的最新配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnCJcxePB6qcH468m_FYsRIMp2g-vzrDM",
+            authDomain: "caligari---test-2.firebaseapp.com",
+            projectId: "caligari---test-2",
+            storageBucket: "caligari---test-2.firebasestorage.app",
+            messagingSenderId: "6710306547",
+            appId: "1:6710306547:web:ac5a376da708edbf138192"
+        };
+        
+        // 初始化 Firebase
+        let firebaseInitialized = false;
+        let db, auth, googleProvider;
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            auth = firebase.auth();
+            googleProvider = new firebase.auth.GoogleAuthProvider();
+            firebaseInitialized = true;
+            
+            // 記錄調試信息
+            document.getElementById('debug-info').style.display = 'block';
+            document.getElementById('debug-output').innerHTML = `
+                <p style="color: green;">Firebase 初始化成功</p>
+                <p>API Key: ${firebaseConfig.apiKey.substring(0, 10)}...</p>
+                <p>Project ID: ${firebaseConfig.projectId}</p>
+                <p>Auth Domain: ${firebaseConfig.authDomain}</p>
+            `;
+        } catch (error) {
+            console.error("Firebase 初始化錯誤:", error);
+            document.getElementById('debug-info').style.display = 'block';
+            document.getElementById('debug-output').innerHTML = `
+                <p style="color: red;">Firebase 初始化失敗</p>
+                <p>錯誤信息: ${error.message}</p>
+                <p>錯誤代碼: ${error.code || '未知'}</p>
+            `;
+        }
         
         // 管理員密碼
         const ADMIN_PASSWORD = "caligari2025"; 
         
         // 全局變量
         let currentUser = null;
+        let googleUserData = null;
         
         // 顯示加載動畫
         function showLoading() {
@@ -963,45 +1095,246 @@
             }, 5000);
         }
         
-        // 獲取所有會員
-        function getAllMembers() {
-            const members = localStorage.getItem(MEMBERS_KEY);
-            return members ? JSON.parse(members) : {};
-        }
-        
-        // 保存所有會員
-        function saveAllMembers(members) {
-            localStorage.setItem(MEMBERS_KEY, JSON.stringify(members));
-        }
-        
-        // 獲取會員
-        function getMember(phone) {
-            const members = getAllMembers();
-            return members[phone] || null;
-        }
-        
-        // 保存會員
-        function saveMember(phone, data) {
-            const members = getAllMembers();
-            members[phone] = data;
-            saveAllMembers(members);
-        }
-        
         // 頁面加載完成後執行
         document.addEventListener("DOMContentLoaded", function() {
             // 註冊/登入表單切換
             document.getElementById('show-register').addEventListener('click', function() {
                 document.getElementById('member-login-form').style.display = 'none';
                 document.getElementById('member-register-form').style.display = 'block';
+                document.getElementById('google-info-form').style.display = 'none';
             });
             
             document.getElementById('show-login').addEventListener('click', function() {
                 document.getElementById('member-login-form').style.display = 'block';
                 document.getElementById('member-register-form').style.display = 'none';
+                document.getElementById('google-info-form').style.display = 'none';
+            });
+            
+            // Google 登入按鈕
+            document.getElementById('google-signin-btn').addEventListener('click', function() {
+                if (!firebaseInitialized) {
+                    showMessage('Firebase 未初始化，無法使用 Google 登入');
+                    return;
+                }
+                
+                showLoading();
+                
+                auth.signInWithPopup(googleProvider)
+                    .then((result) => {
+                        // Google 登入成功
+                        const user = result.user;
+                        
+                        // 檢查用戶是否已經存在於數據庫中
+                        db.collection("members").where("email", "==", user.email).get()
+                            .then((querySnapshot) => {
+                                if (!querySnapshot.empty) {
+                                    // 用戶已存在，獲取會員信息
+                                    const memberDoc = querySnapshot.docs[0];
+                                    currentUser = memberDoc.data();
+                                    currentUser.id = memberDoc.id;
+                                    currentUser.photoURL = user.photoURL;
+                                    showMemberInfo(true);
+                                } else {
+                                    // 用戶不存在，需要填寫額外信息
+                                    googleUserData = {
+                                        uid: user.uid,
+                                        name: user.displayName,
+                                        email: user.email,
+                                        photoURL: user.photoURL
+                                    };
+                                    
+                                    // 顯示 Google 信息填寫表單
+                                    document.getElementById('member-login-form').style.display = 'none';
+                                    document.getElementById('member-register-form').style.display = 'none';
+                                    document.getElementById('google-info-form').style.display = 'block';
+                                    
+                                    // 填充表單
+                                    document.getElementById('google-user-name').textContent = user.displayName;
+                                    document.getElementById('google-user-email').textContent = user.email;
+                                    document.getElementById('user-avatar').src = user.photoURL || 'https://via.placeholder.com/50';
+                                }
+                                hideLoading();
+                            })
+                            .catch((error) => {
+                                hideLoading();
+                                showMessage('獲取會員信息失敗：' + error.message);
+                            });
+                    })
+                    .catch((error) => {
+                        hideLoading();
+                        
+                        // 添加詳細的錯誤信息到調試區域
+                        document.getElementById('debug-output').innerHTML += `
+                            <p style="color: red;">Google 登入錯誤</p>
+                            <p>錯誤信息: ${error.message}</p>
+                            <p>錯誤代碼: ${error.code}</p>
+                        `;
+                        
+                        if (error.code === 'auth/popup-blocked') {
+                            showMessage('彈出窗口被阻止，請允許彈出窗口後重試');
+                        } else if (error.code === 'auth/cancelled-popup-request') {
+                            showMessage('登入已取消');
+                        } else {
+                            showMessage('Google 登入失敗：' + error.message);
+                        }
+                    });
+            });
+            
+            // Google 註冊按鈕
+            document.getElementById('google-register-btn').addEventListener('click', function() {
+                if (!firebaseInitialized) {
+                    showMessage('Firebase 未初始化，無法使用 Google 註冊');
+                    return;
+                }
+                
+                showLoading();
+                
+                auth.signInWithPopup(googleProvider)
+                    .then((result) => {
+                        // Google 登入成功
+                        const user = result.user;
+                        
+                        // 檢查用戶是否已經存在於數據庫中
+                        db.collection("members").where("email", "==", user.email).get()
+                            .then((querySnapshot) => {
+                                if (!querySnapshot.empty) {
+                                    // 用戶已存在
+                                    hideLoading();
+                                    showMessage('此 Google 帳戶已註冊，已為您登入', 'success');
+                                    
+                                    const memberDoc = querySnapshot.docs[0];
+                                    currentUser = memberDoc.data();
+                                    currentUser.id = memberDoc.id;
+                                    currentUser.photoURL = user.photoURL;
+                                    showMemberInfo(true);
+                                } else {
+                                    // 用戶不存在，需要填寫額外信息
+                                    googleUserData = {
+                                        uid: user.uid,
+                                        name: user.displayName,
+                                        email: user.email,
+                                        photoURL: user.photoURL
+                                    };
+                                    
+                                    // 顯示 Google 信息填寫表單
+                                    document.getElementById('member-login-form').style.display = 'none';
+                                    document.getElementById('member-register-form').style.display = 'none';
+                                    document.getElementById('google-info-form').style.display = 'block';
+                                    
+                                    // 填充表單
+                                    document.getElementById('google-user-name').textContent = user.displayName;
+                                    document.getElementById('google-user-email').textContent = user.email;
+                                    document.getElementById('user-avatar').src = user.photoURL || 'https://via.placeholder.com/50';
+                                }
+                                hideLoading();
+                            })
+                            .catch((error) => {
+                                hideLoading();
+                                showMessage('獲取會員信息失敗：' + error.message);
+                            });
+                    })
+                    .catch((error) => {
+                        hideLoading();
+                        
+                        // 添加詳細的錯誤信息到調試區域
+                        document.getElementById('debug-output').innerHTML += `
+                            <p style="color: red;">Google 註冊錯誤</p>
+                            <p>錯誤信息: ${error.message}</p>
+                            <p>錯誤代碼: ${error.code}</p>
+                        `;
+                        
+                        if (error.code === 'auth/popup-blocked') {
+                            showMessage('彈出窗口被阻止，請允許彈出窗口後重試');
+                        } else if (error.code === 'auth/cancelled-popup-request') {
+                            showMessage('註冊已取消');
+                        } else {
+                            showMessage('Google 註冊失敗：' + error.message);
+                        }
+                    });
+            });
+            
+            // Google 額外信息提交
+            document.getElementById('google-complete-btn').addEventListener('click', function() {
+                if (!googleUserData) {
+                    showMessage('Google 用戶數據缺失，請重新登入');
+                    return;
+                }
+                
+                const phone = document.getElementById('google-phone').value;
+                const birthday = document.getElementById('google-birthday').value;
+                const consent = document.getElementById('google-privacy-consent').checked;
+                
+                if (!phone || !birthday) {
+                    showMessage('請填寫所有必填資料');
+                    return;
+                }
+                
+                if (!consent) {
+                    showMessage('請閱讀並同意個人資料收集聲明');
+                    return;
+                }
+                
+                showLoading();
+                
+                // 檢查手機號碼是否已被使用
+                db.collection("members").where("phone", "==", phone).get()
+                    .then((querySnapshot) => {
+                        if (!querySnapshot.empty) {
+                            hideLoading();
+                            showMessage('該手機號碼已被使用');
+                            return;
+                        }
+                        
+                        // 創建新會員數據
+                        const memberData = {
+                            uid: googleUserData.uid,
+                            name: googleUserData.name,
+                            email: googleUserData.email,
+                            phone: phone,
+                            birthday: birthday,
+                            tier: 'Curry Lover',
+                            totalPoints: 0,
+                            availablePoints: 0,
+                            joinDate: new Date().toISOString(),
+                            loginType: 'google'
+                        };
+                        
+                        // 保存到 Firestore，使用 email 作為文檔 ID
+                        return db.collection("members").doc(googleUserData.email).set(memberData)
+                            .then(() => {
+                                // 註冊成功
+                                currentUser = memberData;
+                                currentUser.id = googleUserData.email;
+                                currentUser.photoURL = googleUserData.photoURL;
+                                
+                                hideLoading();
+                                showMessage('註冊成功！歡迎成為咖喱愛好者！', 'success');
+                                
+                                // 顯示會員信息
+                                showMemberInfo(true);
+                                
+                                // 清除 Google 用戶數據
+                                googleUserData = null;
+                            });
+                    })
+                    .catch((error) => {
+                        hideLoading();
+                        showMessage('註冊失敗：' + error.message);
+                    });
+            });
+            
+            // 打開 Google 私隱政策
+            document.getElementById('google-open-privacy').addEventListener('click', function() {
+                document.getElementById('privacyModal').style.display = 'block';
             });
             
             // 會員登入
             document.getElementById('login-btn').addEventListener('click', function() {
+                if (!firebaseInitialized) {
+                    showMessage('Firebase 未初始化，無法登入');
+                    return;
+                }
+                
                 const phone = document.getElementById('login-phone').value;
                 const password = document.getElementById('login-password').value;
                 
@@ -1012,24 +1345,39 @@
                 
                 showLoading();
                 
-                // 模擬網絡延遲
-                setTimeout(() => {
-                    const member = getMember(phone);
-                    
-                    if (!member || member.password !== password) {
+                // 使用 Firebase 身份驗證登入
+                auth.signInWithEmailAndPassword(`${phone}@caligari.com`, password)
+                    .then((userCredential) => {
+                        // 登入成功，獲取用戶信息
+                        getMemberInfo(phone);
+                    })
+                    .catch((error) => {
                         hideLoading();
-                        showMessage('手機號碼或密碼錯誤');
-                        return;
-                    }
-                    
-                    currentUser = member;
-                    showMemberInfo();
-                    hideLoading();
-                }, 800);
+                        
+                        // 添加詳細的錯誤信息到調試區域
+                        document.getElementById('debug-output').innerHTML += `
+                            <p style="color: red;">登入錯誤</p>
+                            <p>錯誤信息: ${error.message}</p>
+                            <p>錯誤代碼: ${error.code}</p>
+                        `;
+                        
+                        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                            showMessage('手機號碼或密碼錯誤');
+                        } else if (error.code === 'auth/api-key-not-valid') {
+                            showMessage('API 密鑰無效，請檢查 Firebase 配置');
+                        } else {
+                            showMessage('登入失敗：' + error.message);
+                        }
+                    });
             });
             
             // 會員註冊
             document.getElementById('register-btn').addEventListener('click', function() {
+                if (!firebaseInitialized) {
+                    showMessage('Firebase 未初始化，無法註冊');
+                    return;
+                }
+                
                 const phone = document.getElementById('reg-phone').value;
                 const password = document.getElementById('reg-password').value;
                 const name = document.getElementById('reg-name').value;
@@ -1048,51 +1396,74 @@
                 
                 showLoading();
                 
-                // 模擬網絡延遲
-                setTimeout(() => {
-                    // 檢查用戶是否已存在
-                    if (getMember(phone)) {
+                // 檢查用戶是否已存在
+                db.collection("members").where("phone", "==", phone).get()
+                    .then((querySnapshot) => {
+                        if (!querySnapshot.empty) {
+                            hideLoading();
+                            showMessage('該手機號碼已註冊');
+                            return;
+                        }
+                        
+                        // 創建認證用戶
+                        return auth.createUserWithEmailAndPassword(`${phone}@caligari.com`, password)
+                            .then((userCredential) => {
+                                // 創建新會員數據
+                                const memberData = {
+                                    uid: userCredential.user.uid,
+                                    phone: phone,
+                                    email: `${phone}@caligari.com`,
+                                    name: name,
+                                    birthday: birthday,
+                                    tier: 'Curry Lover',
+                                    totalPoints: 0,
+                                    availablePoints: 0,
+                                    joinDate: new Date().toISOString(),
+                                    loginType: 'email'
+                                };
+                                
+                                // 保存到 Firestore
+                                return db.collection("members").doc(phone).set(memberData);
+                            })
+                            .then(() => {
+                                // 註冊成功，獲取會員信息
+                                getMemberInfo(phone);
+                            });
+                    })
+                    .catch((error) => {
                         hideLoading();
-                        showMessage('該手機號碼已註冊');
-                        return;
-                    }
-                    
-                    // 創建新會員數據
-                    const memberData = {
-                        phone: phone,
-                        password: password,
-                        name: name,
-                        birthday: birthday,
-                        tier: 'Curry Lover',
-                        totalPoints: 0,
-                        availablePoints: 0,
-                        joinDate: new Date().toISOString()
-                    };
-                    
-                    // 保存會員
-                    saveMember(phone, memberData);
-                    
-                    // 設置當前用戶
-                    currentUser = memberData;
-                    
-                    // 顯示會員信息
-                    showMemberInfo();
-                    hideLoading();
-                    
-                    // 顯示成功信息
-                    showMessage('註冊成功！歡迎成為咖喱愛好者！', 'success');
-                }, 800);
+                        
+                        // 添加詳細的錯誤信息到調試區域
+                        document.getElementById('debug-output').innerHTML += `
+                            <p style="color: red;">註冊錯誤</p>
+                            <p>錯誤信息: ${error.message}</p>
+                            <p>錯誤代碼: ${error.code}</p>
+                        `;
+                        
+                        showMessage('註冊失敗：' + error.message);
+                    });
             });
             
             // 會員登出
             document.getElementById('logout-btn').addEventListener('click', function() {
-                currentUser = null;
-                document.getElementById('member-info').style.display = 'none';
-                document.getElementById('member-login-form').style.display = 'block';
+                if (!firebaseInitialized) {
+                    currentUser = null;
+                    document.getElementById('member-info').style.display = 'none';
+                    document.getElementById('member-login-form').style.display = 'block';
+                    return;
+                }
                 
-                // 清空登入表單
-                document.getElementById('login-phone').value = '';
-                document.getElementById('login-password').value = '';
+                auth.signOut().then(() => {
+                    currentUser = null;
+                    document.getElementById('member-info').style.display = 'none';
+                    document.getElementById('member-login-form').style.display = 'block';
+                    
+                    // 清空登入表單
+                    document.getElementById('login-phone').value = '';
+                    document.getElementById('login-password').value = '';
+                }).catch((error) => {
+                    showMessage('登出失敗：' + error.message);
+                });
             });
             
             // 私隱政策相關
@@ -1112,6 +1483,7 @@
             document.getElementById('agree-privacy').addEventListener('click', function() {
                 document.getElementById('privacyModal').style.display = 'none';
                 document.getElementById('privacy-consent').checked = true;
+                document.getElementById('google-privacy-consent').checked = true;
             });
             
             window.addEventListener('click', function(event) {
@@ -1139,7 +1511,11 @@
                     document.getElementById('admin-panel').style.display = 'block';
                     
                     // 載入會員資料
-                    loadMembers();
+                    if (firebaseInitialized) {
+                        loadMembers();
+                    } else {
+                        showMessage('Firebase 未初始化，無法載入會員列表');
+                    }
                 } else {
                     showMessage('管理員密碼錯誤');
                 }
@@ -1153,58 +1529,80 @@
             
             // 添加積分
             document.getElementById('add-points-btn').addEventListener('click', function() {
-                const phone = document.getElementById('point-phone').value;
+                if (!firebaseInitialized) {
+                    showMessage('Firebase 未初始化，無法添加積分');
+                    return;
+                }
+                
+                const identifier = document.getElementById('point-phone').value;
                 const amount = parseFloat(document.getElementById('point-amount').value);
                 const resultDiv = document.getElementById('point-result');
                 
-                if (!phone || !amount) {
+                if (!identifier || !amount) {
                     resultDiv.innerHTML = '<span style="color: red;">請填寫完整信息</span>';
                     return;
                 }
                 
                 showLoading();
                 
-                // 模擬網絡延遲
-                setTimeout(() => {
-                    const member = getMember(phone);
-                    
-                    if (!member) {
+                // 嘗試以電話號碼查找會員
+                db.collection("members").where("phone", "==", identifier).get()
+                    .then((querySnapshot) => {
+                        if (!querySnapshot.empty) {
+                            // 找到會員
+                            processMemberPoints(querySnapshot.docs[0], amount, resultDiv);
+                        } else {
+                            // 嘗試以電子郵件查找
+                            return db.collection("members").where("email", "==", identifier).get()
+                                .then((emailSnapshot) => {
+                                    if (!emailSnapshot.empty) {
+                                        // 找到會員
+                                        processMemberPoints(emailSnapshot.docs[0], amount, resultDiv);
+                                    } else {
+                                        hideLoading();
+                                        resultDiv.innerHTML = '<span style="color: red;">未找到該會員</span>';
+                                    }
+                                });
+                        }
+                    })
+                    .catch((error) => {
                         hideLoading();
-                        resultDiv.innerHTML = '<span style="color: red;">未找到該會員</span>';
-                        return;
-                    }
-                    
-                    let pointsToAdd;
-                    
-                    // 根據會員等級計算積分
-                    if (member.tier === 'Curry Lover') {
-                        // 每消費$100 = 10分
-                        pointsToAdd = Math.floor(amount / 100) * 10;
-                    } else {
-                        // 每消費$80 = 15分
-                        pointsToAdd = Math.floor(amount / 80) * 15;
-                    }
-                    
-                    // 更新會員積分
-                    const totalPoints = (member.totalPoints || 0) + pointsToAdd;
-                    const availablePoints = (member.availablePoints || 0) + pointsToAdd;
-                    
-                    // 檢查是否需要升級
-                    let tier = member.tier;
-                    let tierChanged = false;
-                    if (tier === 'Curry Lover' && totalPoints >= 500) {
-                        tier = 'Curry Master';
-                        tierChanged = true;
-                    }
-                    
-                    // 更新會員數據
-                    member.totalPoints = totalPoints;
-                    member.availablePoints = availablePoints;
-                    member.tier = tier;
-                    
-                    // 保存更新的會員數據
-                    saveMember(phone, member);
-                    
+                        resultDiv.innerHTML = '<span style="color: red;">添加積分時出錯：' + error.message + '</span>';
+                    });
+            });
+            
+            // 處理會員積分
+            function processMemberPoints(docSnapshot, amount, resultDiv) {
+                const member = docSnapshot.data();
+                let pointsToAdd;
+                
+                // 根據會員等級計算積分
+                if (member.tier === 'Curry Lover') {
+                    // 每消費$100 = 10分
+                    pointsToAdd = Math.floor(amount / 100) * 10;
+                } else {
+                    // 每消費$80 = 15分
+                    pointsToAdd = Math.floor(amount / 80) * 15;
+                }
+                
+                // 更新會員積分
+                const totalPoints = (member.totalPoints || 0) + pointsToAdd;
+                const availablePoints = (member.availablePoints || 0) + pointsToAdd;
+                
+                // 檢查是否需要升級
+                let tier = member.tier;
+                let tierChanged = false;
+                if (tier === 'Curry Lover' && totalPoints >= 500) {
+                    tier = 'Curry Master';
+                    tierChanged = true;
+                }
+                
+                // 更新數據庫
+                db.collection("members").doc(docSnapshot.id).update({
+                    totalPoints: totalPoints,
+                    availablePoints: availablePoints,
+                    tier: tier
+                }).then(() => {
                     hideLoading();
                     resultDiv.innerHTML = `
                         <span style="color: green;">成功添加 ${pointsToAdd} 積分給 ${member.name}</span>
@@ -1219,12 +1617,92 @@
                     loadMembers();
                     
                     // 如果當前用戶是被修改的會員，更新顯示
-                    if (currentUser && currentUser.phone === phone) {
-                        currentUser = member;
-                        updateMemberInfoDisplay();
+                    if (currentUser && (currentUser.phone === member.phone || currentUser.email === member.email)) {
+                        if (currentUser.id === docSnapshot.id) {
+                            currentUser.totalPoints = totalPoints;
+                            currentUser.availablePoints = availablePoints;
+                            currentUser.tier = tier;
+                            updateMemberInfoDisplay();
+                        } else {
+                            // 重新獲取會員信息
+                            if (currentUser.loginType === 'google') {
+                                db.collection("members").doc(currentUser.id).get()
+                                    .then((doc) => {
+                                        if (doc.exists) {
+                                            currentUser = doc.data();
+                                            currentUser.id = doc.id;
+                                            updateMemberInfoDisplay();
+                                        }
+                                    });
+                            } else {
+                                getMemberInfo(currentUser.phone);
+                            }
+                        }
                     }
-                }, 800);
-            });
+                }).catch((error) => {
+                    hideLoading();
+                    resultDiv.innerHTML = '<span style="color: red;">更新積分時出錯：' + error.message + '</span>';
+                });
+            }
+            
+            // 檢查用戶身份驗證狀態
+            if (firebaseInitialized) {
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        // 用戶已登入
+                        // 檢查是否是 Google 登入
+                        const isGoogleUser = user.providerData.some(provider => provider.providerId === 'google.com');
+                        
+                        if (isGoogleUser) {
+                            // Google 用戶，在 Firestore 中查找相關信息
+                            db.collection("members").where("email", "==", user.email).get()
+                                .then((querySnapshot) => {
+                                    if (!querySnapshot.empty) {
+                                        // 找到會員信息
+                                        const memberDoc = querySnapshot.docs[0];
+                                        currentUser = memberDoc.data();
+                                        currentUser.id = memberDoc.id;
+                                        currentUser.photoURL = user.photoURL;
+                                        showMemberInfo(true);
+                                    } else {
+                                        // 未找到會員信息，需要完成註冊
+                                        googleUserData = {
+                                            uid: user.uid,
+                                            name: user.displayName,
+                                            email: user.email,
+                                            photoURL: user.photoURL
+                                        };
+                                        
+                                        // 顯示 Google 信息填寫表單
+                                        document.getElementById('member-login-form').style.display = 'none';
+                                        document.getElementById('member-register-form').style.display = 'none';
+                                        document.getElementById('google-info-form').style.display = 'block';
+                                        
+                                        // 填充表單
+                                        document.getElementById('google-user-name').textContent = user.displayName;
+                                        document.getElementById('google-user-email').textContent = user.email;
+                                        document.getElementById('user-avatar').src = user.photoURL || 'https://via.placeholder.com/50';
+                                    }
+                                })
+                                .catch((error) => {
+                                    showMessage('獲取會員信息失敗：' + error.message);
+                                });
+                        } else {
+                            // 常規電子郵件用戶
+                            const email = user.email;
+                            const phone = email.split('@')[0];
+                            getMemberInfo(phone);
+                        }
+                    } else {
+                        // 用戶未登入
+                        currentUser = null;
+                        document.getElementById('member-info').style.display = 'none';
+                        document.getElementById('member-login-form').style.display = 'block';
+                        document.getElementById('member-register-form').style.display = 'none';
+                        document.getElementById('google-info-form').style.display = 'none';
+                    }
+                });
+            }
             
             // FAQ展開/收起功能
             document.querySelectorAll('.faq-question').forEach(question => {
@@ -1235,33 +1713,63 @@
                     span.textContent = parent.classList.contains('active') ? '-' : '+';
                 });
             });
-            
-            // 檢查是否有保存的登入狀態
-            const savedPhone = localStorage.getItem('currentUserPhone');
-            if (savedPhone) {
-                const member = getMember(savedPhone);
-                if (member) {
-                    currentUser = member;
-                    showMemberInfo();
-                }
-            }
         });
         
+        // 獲取會員信息（通過手機號碼）
+        function getMemberInfo(phone) {
+            if (!firebaseInitialized) {
+                showMessage('Firebase 未初始化，無法獲取會員信息');
+                return;
+            }
+            
+            db.collection("members").doc(phone).get()
+                .then((doc) => {
+                    hideLoading();
+                    
+                    if (doc.exists) {
+                        currentUser = doc.data();
+                        currentUser.id = doc.id;
+                        showMemberInfo(false);
+                    } else {
+                        // 用戶存在於認證系統但不在數據庫中
+                        showMessage('無法獲取會員信息，請聯絡客服');
+                        auth.signOut();
+                    }
+                })
+                .catch((error) => {
+                    hideLoading();
+                    showMessage('獲取會員信息失敗：' + error.message);
+                });
+        }
+        
         // 顯示會員信息
-        function showMemberInfo() {
+        function showMemberInfo(isGoogleUser) {
             document.getElementById('member-login-form').style.display = 'none';
             document.getElementById('member-register-form').style.display = 'none';
+            document.getElementById('google-info-form').style.display = 'none';
             document.getElementById('member-info').style.display = 'block';
             
-            // 保存當前用戶電話，用於自動登入
-            localStorage.setItem('currentUserPhone', currentUser.phone);
+            // 根據登入類型顯示不同的配置文件部分
+            if (isGoogleUser) {
+                document.getElementById('google-profile-section').style.display = 'flex';
+                document.getElementById('normal-profile-section').style.display = 'none';
+                
+                // 設置 Google 用戶頭像
+                document.getElementById('member-avatar').src = currentUser.photoURL || 'https://via.placeholder.com/50';
+                document.getElementById('member-name').textContent = currentUser.name;
+                document.getElementById('member-email').textContent = currentUser.email;
+            } else {
+                document.getElementById('google-profile-section').style.display = 'none';
+                document.getElementById('normal-profile-section').style.display = 'block';
+                
+                document.getElementById('normal-member-name').textContent = currentUser.name;
+            }
             
             updateMemberInfoDisplay();
         }
         
         // 更新會員信息顯示
         function updateMemberInfoDisplay() {
-            document.getElementById('member-name').textContent = currentUser.name;
             document.getElementById('member-tier').textContent = currentUser.tier === 'Curry Lover' ? '咖喱愛好者' : '咖喱大師';
             document.getElementById('total-points').textContent = currentUser.totalPoints || 0;
             document.getElementById('available-points').textContent = currentUser.availablePoints || 0;
@@ -1274,42 +1782,52 @@
         
         // 載入會員資料到管理員面板
         function loadMembers() {
+            if (!firebaseInitialized) {
+                showMessage('Firebase 未初始化，無法載入會員列表');
+                return;
+            }
+            
             showLoading();
             
-            // 模擬網絡延遲
-            setTimeout(() => {
-                const members = getAllMembers();
-                const membersTable = document.getElementById('members-list');
-                membersTable.innerHTML = '';
-                
-                Object.values(members).forEach(member => {
-                    const row = document.createElement('tr');
+            db.collection("members").get()
+                .then((querySnapshot) => {
+                    hideLoading();
                     
-                    // 格式化日期
-                    let joinDate = '未知';
-                    if (member.joinDate) {
-                        const date = new Date(member.joinDate);
-                        joinDate = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-                    }
+                    const membersTable = document.getElementById('members-list');
+                    membersTable.innerHTML = '';
                     
-                    // 轉換會員等級顯示
-                    const tierDisplay = member.tier === 'Curry Lover' ? '咖喱愛好者' : '咖喱大師';
-                    
-                    row.innerHTML = `
-                        <td>${member.name || '未設置'}</td>
-                        <td>${member.phone || '未設置'}</td>
-                        <td>${member.birthday || '未設置'}</td>
-                        <td>${tierDisplay}</td>
-                        <td>${member.totalPoints || 0}</td>
-                        <td>${member.availablePoints || 0}</td>
-                        <td>${joinDate}</td>
-                    `;
-                    
-                    membersTable.appendChild(row);
+                    querySnapshot.forEach((doc) => {
+                        const member = doc.data();
+                        const row = document.createElement('tr');
+                        
+                        // 格式化日期
+                        let joinDate = '未知';
+                        if (member.joinDate) {
+                            const date = new Date(member.joinDate);
+                            joinDate = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                        }
+                        
+                        // 轉換會員等級顯示
+                        const tierDisplay = member.tier === 'Curry Lover' ? '咖喱愛好者' : '咖喱大師';
+                        
+                        row.innerHTML = `
+                            <td>${member.name || '未設置'}</td>
+                            <td>${member.phone || '未設置'}</td>
+                            <td>${member.email || '未設置'}</td>
+                            <td>${member.birthday || '未設置'}</td>
+                            <td>${tierDisplay}</td>
+                            <td>${member.totalPoints || 0}</td>
+                            <td>${member.availablePoints || 0}</td>
+                            <td>${joinDate}</td>
+                        `;
+                        
+                        membersTable.appendChild(row);
+                    });
+                })
+                .catch((error) => {
+                    hideLoading();
+                    showMessage('獲取會員列表失敗：' + error.message);
                 });
-                
-                hideLoading();
-            }, 800);
         }
         
         // 標籤切換功能
