@@ -1,75 +1,51 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>東京冠軍咖哩飯專門店 Caligari - 會員忠誠度計劃</title>
-    
-    <!-- Firebase SDK -->
+    <title>Firebase 配置測試</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-    <style>
-        /* 保持原有的CSS样式不变 */
-        /* ... */
-    </style>
 </head>
 <body>
-    <!-- 保持原有的HTML结构不变 -->
-    <!-- ... -->
-
+    <h1>Firebase 配置測試</h1>
+    <div id="result"></div>
+    
     <script>
-        // 安全提示：实际部署时应将配置移至环境变量
+        // Firebase 配置
         const firebaseConfig = {
             apiKey: "AIzaSyCnCJcxePB6qcH468m_FYsRIMp2g-vzrDM",
             authDomain: "caligari---test-2.firebaseapp.com",
             projectId: "caligari---test-2",
-            storageBucket: "caligari---test-2.appspot.com",
+            storageBucket: "caligari---test-2.firebasestorage.app",
             messagingSenderId: "6710306547",
             appId: "1:6710306547:web:ac5a376da708edbf138192"
         };
-
-        // 初始化 Firebase
+        
+        const resultDiv = document.getElementById('result');
+        
         try {
+            // 初始化 Firebase
             const app = firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-            const auth = firebase.auth();
-            const googleProvider = new firebase.auth.GoogleAuthProvider();
-
-            console.log("Firebase 初始化成功");
-
-            // 环境检测
-            const isLocalhost = window.location.hostname === 'localhost' || 
-                              window.location.hostname === '127.0.0.1';
+            resultDiv.innerHTML += `<p style="color:green;">Firebase 初始化成功: ${app.name}</p>`;
             
-            // 开发环境特殊配置
-            if (isLocalhost) {
-                console.log("运行在本地开发环境");
-                auth.useEmulator("http://localhost:9099");
-                db.useEmulator("localhost", 8080);
-                firebase.functions().useEmulator("localhost", 5001);
-            }
-
-            // 原有的功能代码
-            // ...
-
+            // 初始化 Auth
+            const auth = firebase.auth();
+            resultDiv.innerHTML += `<p style="color:green;">Auth 初始化成功</p>`;
+            
+            // 創建 Google 提供商
+            const googleProvider = new firebase.auth.GoogleAuthProvider();
+            resultDiv.innerHTML += `<p style="color:green;">Google Provider 初始化成功</p>`;
+            
+            // 顯示配置詳情
+            resultDiv.innerHTML += `<p>API Key: ${firebaseConfig.apiKey}</p>`;
+            resultDiv.innerHTML += `<p>Project ID: ${firebaseConfig.projectId}</p>`;
+            resultDiv.innerHTML += `<p>Auth Domain: ${firebaseConfig.authDomain}</p>`;
+            
         } catch (error) {
-            console.error("Firebase 初始化错误:", error);
-            document.getElementById('debug-output').innerHTML = `
-                <p style="color: red;">Firebase 初始化失败</p>
-                <p>错误信息: ${error.message}</p>
-                <p>请检查：</p>
-                <ol>
-                    <li>API密钥是否在Google Cloud控制台正确配置</li>
-                    <li>已添加授权域名：caligari-totoro.github.io</li>
-                    <li>Firebase控制台已启用相应服务</li>
-                </ol>
-            `;
+            resultDiv.innerHTML += `<p style="color:red;">錯誤: ${error.message}</p>`;
+            resultDiv.innerHTML += `<p>錯誤代碼: ${error.code || '未知'}</p>`;
+            resultDiv.innerHTML += `<p>錯誤堆棧: ${error.stack || '未提供'}</p>`;
         }
-
-        // 原有的业务逻辑代码
-        // ...
     </script>
 </body>
 </html>
